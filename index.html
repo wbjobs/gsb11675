@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Bluetooth 控制台</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Web Bluetooth 控制台</h1>
+    <div class="status-badges">
+      <span id="envBadge" class="badge badge-unknown">环境检测中…</span>
+      <span id="permBadge" class="badge badge-unknown">权限：未知</span>
+      <span id="connBadge" class="badge badge-unknown">未连接</span>
+    </div>
+  </header>
+
+  <!-- 环境 / 权限警告横幅 -->
+  <section id="bannerArea" class="banner-area" hidden>
+    <div id="banner" class="banner" role="alert">
+      <span id="bannerText"></span>
+      <button id="bannerAction" type="button" hidden></button>
+    </div>
+  </section>
+
+  <main class="layout">
+    <!-- 左栏：扫描与设备信息 -->
+    <section class="panel" aria-labelledby="scanTitle">
+      <h2 id="scanTitle">扫描与连接</h2>
+      <div class="row">
+        <button id="scanBtn" type="button">扫描并连接设备</button>
+        <button id="disconnectBtn" type="button" disabled>断开连接</button>
+        <button id="reconnectBtn" type="button" disabled>重新连接</button>
+      </div>
+      <div class="row">
+        <label for="nameFilter">名称过滤（可选）</label>
+        <input id="nameFilter" type="text" placeholder="留空则显示全部设备">
+      </div>
+
+      <h3>设备信息</h3>
+      <dl id="deviceInfo" class="kv">
+        <div><dt>名称</dt><dd id="devName">—</dd></div>
+        <div><dt>ID</dt><dd id="devId">—</dd></div>
+        <div><dt>GATT</dt><dd id="devGatt">—</dd></div>
+        <div><dt>信号强度</dt><dd id="devRssi">—</dd></div>
+        <div><dt>断开原因</dt><dd id="devDisconnectReason">—</dd></div>
+      </dl>
+
+      <h3>信号强度（RSSI）</h3>
+      <canvas id="rssiCanvas" width="360" height="120" aria-label="信号强度曲线"></canvas>
+      <p class="hint" id="rssiHint">连接后如浏览器支持 watchAdvertisements 将自动绘制。</p>
+    </section>
+
+    <!-- 右栏：服务与特征 -->
+    <section class="panel" aria-labelledby="gattTitle">
+      <h2 id="gattTitle">服务与特征</h2>
+      <div id="serviceTree" class="service-tree"><p class="hint">尚未连接设备。</p></div>
+
+      <h3>特征操作</h3>
+      <div class="row">
+        <label for="svcUuid">服务 UUID</label>
+        <input id="svcUuid" type="text" placeholder="如 0x180F 或完整 UUID">
+      </div>
+      <div class="row">
+        <label for="chrUuid">特征 UUID</label>
+        <input id="chrUuid" type="text" placeholder="如 0x2A19">
+      </div>
+      <div class="row">
+        <label for="writeValue">写入值（hex，如 01 0A）</label>
+        <input id="writeValue" type="text" placeholder="01 0a ff">
+      </div>
+      <div class="row">
+        <button id="readBtn" type="button" disabled>读取</button>
+        <button id="writeBtn" type="button" disabled>写入</button>
+        <button id="subscribeBtn" type="button" disabled>订阅通知</button>
+      </div>
+      <div class="row">
+        <label for="opResult">结果</label>
+        <output id="opResult">—</output>
+      </div>
+    </section>
+
+    <!-- 降级：手动输入模式 -->
+    <section id="manualPanel" class="panel panel-manual" aria-labelledby="manualTitle" hidden>
+      <h2 id="manualTitle">手动输入模式（降级）</h2>
+      <p class="hint">Web Bluetooth 不可用或权限被拒时，可在此手动录入设备数据，或启动模拟设备体验完整流程。</p>
+      <div class="row">
+        <label for="manualName">设备名称</label>
+        <input id="manualName" type="text" placeholder="手动输入设备名称">
+      </div>
+      <div class="row">
+        <label for="manualRssi">信号强度 (dBm)</label>
+        <input id="manualRssi" type="number" min="-100" max="0" value="-60">
+      </div>
+      <div class="row">
+        <button id="manualAddBtn" type="button">记录到本地</button>
+        <button id="simulateBtn" type="button">启动模拟设备</button>
+      </div>
+    </section>
+
+    <!-- 日志 -->
+    <section class="panel panel-log" aria-labelledby="logTitle">
+      <h2 id="logTitle">日志</h2>
+      <div class="row">
+        <button id="clearLogBtn" type="button">清空日志</button>
+        <button id="exportLogBtn" type="button">导出日志</button>
+      </div>
+      <ul id="logList" class="log-list" aria-live="polite"></ul>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
