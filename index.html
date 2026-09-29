@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Web Bluetooth 控制台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>Web Bluetooth 控制台</h1>
+    <p class="subtitle">低功耗蓝牙设备扫描 · 连接 · 读写 · 订阅</p>
+  </header>
+
+  <!-- 环境/权限横幅：不支持、非安全上下文、权限被拒时显示 -->
+  <section id="env-banner" class="banner hidden" role="alert"></section>
+
+  <main>
+    <!-- 环境检测与权限状态 -->
+    <section class="card" id="env-card">
+      <h2>环境与权限</h2>
+      <dl class="status-grid">
+        <dt>安全上下文 (HTTPS/localhost)</dt><dd id="st-secure">检测中…</dd>
+        <dt>浏览器支持 Web Bluetooth</dt><dd id="st-support">检测中…</dd>
+        <dt>权限状态 (Permissions API)</dt><dd id="st-permission">检测中…</dd>
+        <dt>连接状态</dt><dd id="st-connection">未连接</dd>
+        <dt>上次断开原因</dt><dd id="st-disconnect-reason">—</dd>
+      </dl>
+    </section>
+
+    <!-- 扫描与连接 -->
+    <section class="card" id="scan-card">
+      <h2>扫描与连接</h2>
+      <div class="row">
+        <input type="text" id="filter-name" placeholder="设备名前缀（可选）">
+        <input type="text" id="filter-service" placeholder="服务 UUID（可选，如 0x180F / battery_service）">
+      </div>
+      <div class="row">
+        <label><input type="checkbox" id="accept-all"> 接受所有设备（acceptAllDevices）</label>
+      </div>
+      <div class="row">
+        <button id="btn-scan" class="primary">扫描并连接</button>
+        <button id="btn-reconnect-saved" disabled>重连已授权设备</button>
+        <button id="btn-disconnect" disabled>断开连接</button>
+      </div>
+      <p class="hint">提示：扫描必须由点击等用户交互触发；设备未找到或连接失败可直接重试。</p>
+    </section>
+
+    <!-- 设备信息与信号可视化 -->
+    <section class="card hidden" id="device-card">
+      <h2>设备信息</h2>
+      <dl class="status-grid">
+        <dt>设备名称</dt><dd id="dev-name">—</dd>
+        <dt>设备 ID</dt><dd id="dev-id">—</dd>
+        <dt>信号强度 (RSSI)</dt><dd id="dev-rssi">—</dd>
+      </dl>
+      <canvas id="rssi-canvas" width="600" height="120" aria-label="信号强度曲线"></canvas>
+      <p class="hint" id="rssi-hint"></p>
+    </section>
+
+    <!-- 服务与特征 -->
+    <section class="card hidden" id="services-card">
+      <h2>服务与特征</h2>
+      <div id="services-list"></div>
+    </section>
+
+    <!-- 特征操作区 -->
+    <section class="card hidden" id="char-card">
+      <h2>特征读写</h2>
+      <div class="row">
+        <input type="text" id="op-service" placeholder="服务 UUID">
+        <input type="text" id="op-char" placeholder="特征 UUID">
+      </div>
+      <div class="row">
+        <button id="btn-read">读取</button>
+        <button id="btn-notify">订阅通知</button>
+      </div>
+      <div class="row">
+        <input type="text" id="write-value" placeholder="写入值（hex，如 01 0A FF）">
+        <button id="btn-write">写入</button>
+      </div>
+      <div class="row">
+        <span>当前值：</span><code id="char-value">—</code>
+      </div>
+    </section>
+
+    <!-- 手动输入降级模式 -->
+    <section class="card hidden" id="manual-card">
+      <h2>手动模式（降级）</h2>
+      <p class="hint">当前环境无法使用 Web Bluetooth。可手动记录设备配置，保存到本地，待环境支持后使用。</p>
+      <div class="row">
+        <input type="text" id="manual-name" placeholder="设备名称">
+        <input type="text" id="manual-mac" placeholder="MAC / 标识（可选）">
+      </div>
+      <div class="row">
+        <input type="text" id="manual-service" placeholder="服务 UUID">
+        <input type="text" id="manual-char" placeholder="特征 UUID">
+      </div>
+      <div class="row">
+        <button id="btn-manual-save">保存配置</button>
+      </div>
+      <ul id="manual-list"></ul>
+    </section>
+
+    <!-- 日志 -->
+    <section class="card">
+      <h2>日志</h2>
+      <button id="btn-clear-log">清空日志</button>
+      <pre id="log" aria-live="polite"></pre>
+    </section>
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
